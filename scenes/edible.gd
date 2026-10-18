@@ -135,7 +135,7 @@ func _physics_process(delta):
 			if not is_on_ground():
 				change_state(State.FALLING)
 			else:
-				linear_velocity.x = (RUN_VELOCITY * run_direction)
+				linear_velocity.x = RUN_VELOCITY * run_direction
 
 		State.FALLING:
 			if is_on_ground():
