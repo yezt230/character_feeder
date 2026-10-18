@@ -5,7 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://dp1ck8qb8jav7" path="res://scenes/edible_frame_controller.tscn" id="3_2kcqm"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_yleod"]
-size = Vector2(79, 75)
+size = Vector2(137, 127)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_7d04f"]
 radius = 51.0392
@@ -89,6 +89,7 @@ _data = {
 [node name="Edible" type="RigidBody2D" unique_id=739754446]
 collision_layer = 8
 input_pickable = true
+lock_rotation = true
 script = ExtResource("1_ycm2a")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=170405809]

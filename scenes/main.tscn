@@ -11,10 +11,13 @@
 size = Vector2(1211, 20)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_7d04f"]
-size = Vector2(16, 675.5)
+size = Vector2(16, 1784)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_skcvu"]
-size = Vector2(13.5, 663)
+size = Vector2(13.5, 1791)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_u3ntc"]
+size = Vector2(1134, 58)
 
 [node name="Main" type="Node2D" unique_id=1080789217]
 
@@ -34,12 +37,16 @@ position = Vector2(586, 598)
 shape = SubResource("RectangleShape2D_nxlau")
 
 [node name="CollisionShape2D2" type="CollisionShape2D" parent="Ground" unique_id=1409297870]
-position = Vector2(1140, 301.25)
+position = Vector2(1140, -253)
 shape = SubResource("RectangleShape2D_7d04f")
 
 [node name="CollisionShape2D3" type="CollisionShape2D" parent="Ground" unique_id=1912114987]
-position = Vector2(10.25, 319.5)
+position = Vector2(10.25, -244.5)
 shape = SubResource("RectangleShape2D_skcvu")
+
+[node name="CollisionShape2D4" type="CollisionShape2D" parent="Ground" unique_id=1128390419]
+position = Vector2(574, -1158)
+shape = SubResource("RectangleShape2D_u3ntc")
 
 [node name="EdibleLayer" type="CanvasLayer" parent="." unique_id=2062295065]
 layer = 2
@@ -73,14 +80,15 @@ mouse_filter = 1
 
 [node name="RighVBoxContainer" type="VBoxContainer" parent="HUD/MarginContainer/HBoxContainer" unique_id=730498332]
 layout_mode = 2
+theme_override_constants/separation = 48
 
 [node name="ResetButton" parent="HUD/MarginContainer/HBoxContainer/RighVBoxContainer" unique_id=102663876 instance=ExtResource("4_jyhfs")]
 layout_mode = 2
-size_flags_horizontal = 0
-size_flags_vertical = 0
+size_flags_horizontal = 8
 
 [node name="ImageUploader" parent="HUD/MarginContainer/HBoxContainer/RighVBoxContainer" unique_id=1521830573 instance=ExtResource("5_tbgi4")]
 layout_mode = 2
+size_flags_horizontal = 8
 
 [node name="Cover" type="Node2D" parent="." unique_id=487373303]
 visible = false
