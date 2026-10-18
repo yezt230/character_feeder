@@ -4,7 +4,7 @@
 
 [node name="ImageUploader" type="Node2D" unique_id=1521830573]
 
-[node name="Button" type="Button" parent="." unique_id=303365538]
+[node name="UploadButton" type="Button" parent="." unique_id=303365538]
 offset_right = 8.0
 offset_bottom = 8.0
 text = "Upload
