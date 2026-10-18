@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://bwr68vk0lhb8r" path="res://scenes/predator.tscn" id="2_0wfyh"]
 [ext_resource type="PackedScene" uid="uid://ig2gl8s20vf8" path="res://scenes/edible_spawner.tscn" id="3_sugp2"]
 [ext_resource type="PackedScene" uid="uid://dwhe0qvm2myce" path="res://reset_button.tscn" id="4_jyhfs"]
+[ext_resource type="Script" uid="uid://0hjcalt05eke" path="res://scenes/game_manager.gd" id="5_game_manager"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_nxlau"]
 size = Vector2(1211, 20)
@@ -15,6 +16,10 @@ size = Vector2(16, 675.5)
 size = Vector2(13.5, 663)
 
 [node name="Main" type="Node2D" unique_id=1080789217]
+script = ExtResource("5_game_manager")
+
+[node name="AutoFeedTimer" type="Timer" parent="." unique_id=217536099]
+wait_time = 8.0
 
 [node name="BGSprite" type="Sprite2D" parent="." unique_id=468305354]
 position = Vector2(578, 338)
@@ -69,12 +74,37 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 0
 
+[node name="Shop" type="VBoxContainer" parent="CanvasLayer/MarginContainer/HBoxContainer" unique_id=1015397400]
+custom_minimum_size = Vector2(270, 0)
+layout_mode = 2
+
+[node name="ScoreLabel" type="Label" parent="CanvasLayer/MarginContainer/HBoxContainer/Shop" unique_id=1183490487]
+layout_mode = 2
+text = "Belly points: 0 / 120"
+
+[node name="BankLabel" type="Label" parent="CanvasLayer/MarginContainer/HBoxContainer/Shop" unique_id=1872918645]
+layout_mode = 2
+text = "Banked points: 0"
+
+[node name="StatusLabel" type="Label" parent="CanvasLayer/MarginContainer/HBoxContainer/Shop" unique_id=913047671]
+layout_mode = 2
+text = "Stage: 1/3 | Auto feed: OFF"
+
+[node name="AutoUpgradeButton" type="Button" parent="CanvasLayer/MarginContainer/HBoxContainer/Shop" unique_id=461271474]
+layout_mode = 2
+text = "Auto Feed — 80"
+
+[node name="StageUpgradeButton" type="Button" parent="CanvasLayer/MarginContainer/HBoxContainer/Shop" unique_id=688940395]
+layout_mode = 2
+text = "Unlock Stage II — 240"
+
 [node name="ResetButton" parent="CanvasLayer/MarginContainer/HBoxContainer" unique_id=102663876 instance=ExtResource("4_jyhfs")]
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
 
 [node name="Cover" type="Node2D" parent="." unique_id=487373303]
+visible = false
 
 [node name="ColorRect" type="ColorRect" parent="Cover" unique_id=97745311]
 offset_left = 501.0

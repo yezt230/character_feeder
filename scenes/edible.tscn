@@ -115,6 +115,19 @@ animation_player = NodePath("../AnimalAnimationPlayer")
 [node name="AnimalAnimationPlayer" type="AnimationPlayer" parent="." unique_id=550386280]
 libraries/ = SubResource("AnimationLibrary_1yvyh")
 
+[node name="RareMarker" type="Label" parent="."]
+visible = false
+offset_left = -31.0
+offset_top = -108.0
+offset_right = 39.0
+offset_bottom = -76.0
+theme_override_colors/font_color = Color(1, 0.84, 0.2, 1)
+theme_override_colors/font_outline_color = Color(0.28, 0.17, 0.1, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 17
+text = "★ RARE"
+mouse_filter = 2
+
 [node name="StateLabel" type="Label" parent="." unique_id=2143063171]
 visible = false
 offset_left = 34.0
@@ -123,7 +136,4 @@ offset_right = 74.0
 offset_bottom = -48.0
 text = "test"
 
-[connection signal="body_entered" from="." to="." method="_on_body_entered"]
-[connection signal="body_exited" from="." to="." method="_on_body_exited"]
 [connection signal="area_entered" from="EatenHurtbox" to="." method="_on_eaten_hurtbox_area_entered"]
-[connection signal="body_entered" from="EatenHurtbox" to="." method="_on_eaten_hurtbox_body_entered"]

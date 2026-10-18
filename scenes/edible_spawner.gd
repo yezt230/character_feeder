@@ -1,5 +1,7 @@
 extends Button
 
+const Balance = preload("res://scenes/game_balance.gd")
+
 @export var edible_scene : PackedScene
 @onready var predator = get_tree().get_first_node_in_group("predator")				
 @onready var button_sprite = $ButtonSprite
@@ -20,10 +22,16 @@ func spawn_edible():
 	var edible_instance = edible_scene.instantiate()
 	#edible_instance.global_position = spawn_marker_2d.global_position
 	edible_instance.global_position = get_spawn_position()
-	edible_instance.eaten.connect(predator._on_edible_eaten)	
+	edible_instance.eaten.connect(predator._on_edible_eaten)
 	var main = get_tree().current_scene
-	var edible_layer = get_tree().current_scene.get_node("EdibleLayer")
+	var edible_layer = main.get_node("EdibleLayer")
 	edible_layer.add_child(edible_instance)
+	# One configurable rare-pool roll per spawn, based on current stage.
+	var stage_info: Dictionary = main.current_stage_data()
+	if randf() < float(stage_info["rare_chance"]):
+		var rare_id: String = Balance.pick_rare_prey(main.stage)
+		if rare_id != "":
+			edible_instance.apply_prey_variant(rare_id)
 
 
 func _on_pressed():

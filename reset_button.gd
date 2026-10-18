@@ -1,4 +1,4 @@
 extends Button
 
-func _pressed():
-	get_tree().reload_current_scene()
+func _pressed() -> void:
+    get_tree().current_scene.start_digest()

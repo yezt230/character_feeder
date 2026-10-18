@@ -4,6 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://cc64drvypvlxx" path="res://assets/pred.png" id="2_wacsr"]
 [ext_resource type="Shader" uid="uid://jy87myry1sd0" path="res://scenes/belly_outline.gdshader" id="3_koidv"]
 [ext_resource type="AudioStream" uid="uid://bsm4vtqrl7y0l" path="res://sounds/gulp11-weirddeep.wav" id="4_q77xh"]
+[ext_resource type="AudioStream" path="res://sounds/digest_placeholder.wav" id="5_digest"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_koidv"]
 shader = ExtResource("3_koidv")
@@ -249,6 +250,10 @@ shape = SubResource("RectangleShape2D_nxlau")
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." unique_id=101536423]
 stream = ExtResource("4_q77xh")
+bus = &"SFX"
+
+[node name="DigestAudioPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("5_digest")
 bus = &"SFX"
 
 [connection signal="area_entered" from="MouthOpenCollision" to="." method="_on_mouth_open_collision_area_entered"]

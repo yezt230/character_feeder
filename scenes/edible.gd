@@ -1,7 +1,9 @@
 
 extends RigidBody2D
 
-signal eaten
+signal eaten(points: int)
+
+const Balance = preload("res://scenes/game_balance.gd")
 
 @onready var edible_frame_controller = $EdibleFrameController
 @onready var running_timer: Timer = $EdibleFrameController/RunningTimer
@@ -12,6 +14,7 @@ enum State {
 	RUNNING,
 	FALLING,
 	DRAGGING,
+	AUTO_JUMP,
 	EATEN
 }
 
@@ -19,6 +22,9 @@ var current_state: State = State.FALLING
 var drag_offset := Vector2.ZERO
 var on_ground: bool = false
 var run_direction: int = 1
+var score_value: int = 10
+var prey_id: String = "rabbit"
+@onready var rare_marker: Label = $RareMarker
 
 const RUN_VELOCITY: float = 150.0
 
@@ -31,6 +37,7 @@ func _ready():
 	running_timer.timeout.connect(_on_running_timer_timeout)
 	running_timer.stop()
 
+	apply_prey_variant(edible_frame_controller.current_animal)
 	enter_state(current_state)
 
 
@@ -80,9 +87,14 @@ func enter_state(state: State):
 			linear_velocity = Vector2.ZERO
 			edible_frame_controller.animal_dragging()
 
+		State.AUTO_JUMP:
+			freeze = true
+			linear_velocity = Vector2.ZERO
+			edible_frame_controller.animal_in_air()
+
 		State.EATEN:
 			running_timer.stop()
-			eaten.emit()
+			eaten.emit(score_value)
 			queue_free()
 
 
@@ -91,7 +103,7 @@ func exit_state(state: State):
 		State.RUNNING:
 			linear_velocity.x = 0.0
 
-		State.DRAGGING:
+		State.DRAGGING, State.AUTO_JUMP:
 			freeze = false
 
 
@@ -103,7 +115,7 @@ func _input_event(viewport, event, shape_idx):
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 
-			if current_state == State.EATEN:
+			if current_state == State.EATEN or current_state == State.AUTO_JUMP:
 				return
 
 			drag_offset = global_position - get_global_mouse_position()
@@ -144,7 +156,7 @@ func _physics_process(delta):
 		State.DRAGGING:
 			global_position = get_global_mouse_position() + drag_offset
 
-		State.EATEN:
+		State.AUTO_JUMP, State.EATEN:
 			pass
 
 
@@ -178,4 +190,51 @@ func _integrate_forces(state: PhysicsDirectBodyState2D):
 # ----------------------------
 
 func _on_eaten_hurtbox_area_entered(area):
+	if area.name != "EatenHitbox":
+		return
+	var predator = area.get_parent()
+	if predator.has_method("can_eat") and not predator.can_eat():
+		return
 	change_state(State.EATEN)
+
+
+# Any entry in game_balance.gd/PREY_TYPES can be displayed without new code.
+# Special variants reuse the animations of their base_animal.
+func apply_prey_variant(variant_id: String) -> void:
+	if not Balance.PREY_TYPES.has(variant_id):
+		push_warning("Unknown prey variant: " + variant_id)
+		return
+	var info: Dictionary = Balance.PREY_TYPES[variant_id]
+	var base_animal: String = str(info["base_animal"])
+	if not edible_frame_controller.animals.has(base_animal):
+		push_warning("Missing sprite frames for: " + base_animal)
+		return
+	prey_id = variant_id
+	score_value = int(info["points"])
+	edible_frame_controller.current_animal = base_animal
+	edible_frame_controller.animal_in_air()
+	$Sprite2D.modulate = Color(str(info.get("tint", "#ffffff")))
+	rare_marker.visible = bool(info.get("rare", false))
+
+
+func can_auto_jump() -> bool:
+	return current_state == State.RESTING or current_state == State.RUNNING or current_state == State.FALLING
+
+
+func auto_jump_into_mouth(target_position: Vector2) -> void:
+	if not can_auto_jump():
+		return
+	change_state(State.AUTO_JUMP)
+	var highest_position: Vector2 = (global_position + target_position) / 2.0 + Vector2(0.0, -150.0)
+	var tween: Tween = create_tween()
+	tween.tween_property(self, "global_position", highest_position, 0.45).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.tween_property(self, "global_position", target_position, 0.35).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	tween.tween_callback(_finish_auto_jump)
+
+
+func _finish_auto_jump() -> void:
+	var predator = get_tree().get_first_node_in_group("predator")
+	if predator != null and predator.can_eat():
+		change_state(State.EATEN)
+	else:
+		change_state(State.FALLING)

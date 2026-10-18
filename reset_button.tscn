@@ -25,15 +25,17 @@ corner_radius_bottom_right = 12
 corner_radius_bottom_left = 12
 
 [node name="ResetButton" type="Button" unique_id=102663876]
-custom_minimum_size = Vector2(70, 70)
+custom_minimum_size = Vector2(145, 70)
 offset_right = 8.0
 offset_bottom = 8.0
 theme_override_styles/normal = SubResource("StyleBoxFlat_emgp1")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_0fuqg")
 theme_override_styles/hover = SubResource("StyleBoxFlat_ll5te")
+text = "Digest"
 script = ExtResource("1_emgp1")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1639906920]
+visible = false
 position = Vector2(35, 35)
 scale = Vector2(0.1, 0.1)
 texture = ExtResource("1_qisyo")
