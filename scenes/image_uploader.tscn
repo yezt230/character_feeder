@@ -2,9 +2,12 @@
 
 [ext_resource type="Script" uid="uid://n7txg86l1nab" path="res://scenes/button.gd" id="1_246e8"]
 
-[node name="ImageUploader" type="Node2D" unique_id=1521830573]
+[node name="ImageUploader" type="Control" unique_id=505353900]
+layout_mode = 3
+anchors_preset = 0
 
 [node name="UploadButton" type="Button" parent="." unique_id=303365538]
+layout_mode = 0
 offset_right = 8.0
 offset_bottom = 8.0
 text = "Upload

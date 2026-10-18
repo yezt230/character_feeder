@@ -43,9 +43,9 @@ shape = SubResource("RectangleShape2D_skcvu")
 [node name="EdibleLayer" type="CanvasLayer" parent="." unique_id=2062295065]
 layer = 2
 
-[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=31499115]
+[node name="HUD" type="CanvasLayer" parent="." unique_id=31499115]
 
-[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer" unique_id=1563250635]
+[node name="MarginContainer" type="MarginContainer" parent="HUD" unique_id=1563250635]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -56,27 +56,29 @@ theme_override_constants/margin_top = 24
 theme_override_constants/margin_right = 24
 theme_override_constants/margin_bottom = 24
 
-[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/MarginContainer" unique_id=1018809667]
+[node name="HBoxContainer" type="HBoxContainer" parent="HUD/MarginContainer" unique_id=1018809667]
 layout_mode = 2
 
-[node name="EdibleSpawner" parent="CanvasLayer/MarginContainer/HBoxContainer" unique_id=2095343811 instance=ExtResource("3_sugp2")]
+[node name="LeftVBoxContainer" type="VBoxContainer" parent="HUD/MarginContainer/HBoxContainer" unique_id=883312263]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="EdibleSpawner" parent="HUD/MarginContainer/HBoxContainer/LeftVBoxContainer" unique_id=2095343811 instance=ExtResource("3_sugp2")]
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
 mouse_filter = 1
 
-[node name="Spacer" type="Control" parent="CanvasLayer/MarginContainer/HBoxContainer" unique_id=585163171]
+[node name="RighVBoxContainer" type="VBoxContainer" parent="HUD/MarginContainer/HBoxContainer" unique_id=730498332]
 layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 0
 
-[node name="ResetButton" parent="CanvasLayer/MarginContainer/HBoxContainer" unique_id=102663876 instance=ExtResource("4_jyhfs")]
+[node name="ResetButton" parent="HUD/MarginContainer/HBoxContainer/RighVBoxContainer" unique_id=102663876 instance=ExtResource("4_jyhfs")]
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
 
-[node name="ImageUploader" parent="CanvasLayer/MarginContainer/HBoxContainer" unique_id=1521830573 instance=ExtResource("5_tbgi4")]
-position = Vector2(9, 198)
+[node name="ImageUploader" parent="HUD/MarginContainer/HBoxContainer/RighVBoxContainer" unique_id=1521830573 instance=ExtResource("5_tbgi4")]
+layout_mode = 2
 
 [node name="Cover" type="Node2D" parent="." unique_id=487373303]
 visible = false
