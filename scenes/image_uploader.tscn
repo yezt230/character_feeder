@@ -1,0 +1,12 @@
+[gd_scene format=3 uid="uid://djdgtrvy7rnh2"]
+
+[ext_resource type="Script" uid="uid://n7txg86l1nab" path="res://scenes/button.gd" id="1_246e8"]
+
+[node name="ImageUploader" type="Node2D" unique_id=1521830573]
+
+[node name="Button" type="Button" parent="." unique_id=303365538]
+offset_right = 8.0
+offset_bottom = 8.0
+text = "Upload
+"
+script = ExtResource("1_246e8")

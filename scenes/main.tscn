@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://bwr68vk0lhb8r" path="res://scenes/predator.tscn" id="2_0wfyh"]
 [ext_resource type="PackedScene" uid="uid://ig2gl8s20vf8" path="res://scenes/edible_spawner.tscn" id="3_sugp2"]
 [ext_resource type="PackedScene" uid="uid://dwhe0qvm2myce" path="res://reset_button.tscn" id="4_jyhfs"]
+[ext_resource type="PackedScene" uid="uid://djdgtrvy7rnh2" path="res://scenes/image_uploader.tscn" id="5_tbgi4"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_nxlau"]
 size = Vector2(1211, 20)
@@ -73,6 +74,9 @@ size_flags_vertical = 0
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
+
+[node name="ImageUploader" parent="CanvasLayer/MarginContainer/HBoxContainer" unique_id=1521830573 instance=ExtResource("5_tbgi4")]
+position = Vector2(9, 198)
 
 [node name="Cover" type="Node2D" parent="." unique_id=487373303]
 
