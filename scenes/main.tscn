@@ -1,7 +1,10 @@
 [gd_scene format=3 uid="uid://bdm1bwo0j4bnf"]
 
-[ext_resource type="Texture2D" uid="uid://kcud76o3mqa5" path="res://assets/Bliss_(Windows_XP).png" id="1_sugp2"]
+[ext_resource type="Texture2D" uid="uid://co1p3dt412ug5" path="res://assets/bg.png" id="1_tefeu"]
+[ext_resource type="Script" uid="uid://b1p87yjgw6myc" path="res://scenes/main.gd" id="1_tipki"]
 [ext_resource type="PackedScene" uid="uid://bwr68vk0lhb8r" path="res://scenes/predator.tscn" id="2_0wfyh"]
+[ext_resource type="PackedScene" uid="uid://4f3bmp5ga4r8" path="res://scenes/flower_sprite.tscn" id="2_85g3d"]
+[ext_resource type="Texture2D" uid="uid://ehto7a7e54sb" path="res://assets/seat.png" id="2_o6xl0"]
 [ext_resource type="PackedScene" uid="uid://ig2gl8s20vf8" path="res://scenes/edible_spawner.tscn" id="3_sugp2"]
 [ext_resource type="Theme" uid="uid://bfujsoaj35gw8" path="res://hud_theme.tres" id="3_tefeu"]
 [ext_resource type="PackedScene" uid="uid://dwhe0qvm2myce" path="res://reset_button.tscn" id="4_jyhfs"]
@@ -20,11 +23,21 @@ size = Vector2(13.5, 1791)
 size = Vector2(1134, 58)
 
 [node name="Main" type="Node2D" unique_id=1080789217]
+script = ExtResource("1_tipki")
+flower = ExtResource("2_85g3d")
 
 [node name="BGSprite" type="Sprite2D" parent="." unique_id=468305354]
-position = Vector2(578, 338)
-scale = Vector2(3.2, 3.2)
-texture = ExtResource("1_sugp2")
+position = Vector2(578, 325)
+scale = Vector2(0.9, 0.9)
+texture = ExtResource("1_tefeu")
+
+[node name="FlowerLayer" type="CanvasLayer" parent="." unique_id=1841900403]
+layer = 0
+
+[node name="SeatSprite" type="Sprite2D" parent="." unique_id=2062301053]
+position = Vector2(570, 518)
+scale = Vector2(0.9, 0.9)
+texture = ExtResource("2_o6xl0")
 
 [node name="Predator" parent="." unique_id=493401095 instance=ExtResource("2_0wfyh")]
 position = Vector2(579, 438)
