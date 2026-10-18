@@ -79,6 +79,7 @@ size_flags_vertical = 0
 position = Vector2(9, 198)
 
 [node name="Cover" type="Node2D" parent="." unique_id=487373303]
+visible = false
 
 [node name="ColorRect" type="ColorRect" parent="Cover" unique_id=97745311]
 offset_left = 501.0

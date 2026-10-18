@@ -4,6 +4,7 @@ extends Button
 var file_callback: JavaScriptObject
 @onready var predator : Node2D = get_tree().get_first_node_in_group("predator")
 @onready var body_sprite : Sprite2D = predator.get_node("Visuals/Sprite2D")
+@onready var belly_sprite : Sprite2D = predator.get_node("Visuals/Belly/BellySprite/Sprite2D")
 
 func _ready() -> void:
 	pressed.connect(_on_pressed)
@@ -55,3 +56,4 @@ func _on_file_selected(arguments: Array) -> void:
 	
 	var texture := ImageTexture.create_from_image(image)
 	body_sprite.texture = texture
+	belly_sprite.texture = texture
