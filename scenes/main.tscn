@@ -31,6 +31,16 @@ position = Vector2(578, 325)
 scale = Vector2(0.9, 0.9)
 texture = ExtResource("1_tefeu")
 
+[node name="ColorRect" type="ColorRect" parent="." unique_id=1661709192]
+custom_minimum_size = Vector2(1153, 700)
+offset_top = -1.0
+offset_right = 1153.0
+offset_bottom = 699.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0, 0, 0, 0.09411765)
+metadata/_edit_use_anchors_ = true
+
 [node name="FlowerLayer" type="CanvasLayer" parent="." unique_id=1841900403]
 layer = 0
 
