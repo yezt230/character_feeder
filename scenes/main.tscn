@@ -41,8 +41,7 @@ size_flags_vertical = 3
 color = Color(0, 0, 0, 0.09411765)
 metadata/_edit_use_anchors_ = true
 
-[node name="FlowerLayer" type="CanvasLayer" parent="." unique_id=1841900403]
-layer = 0
+[node name="FlowerLayer" type="Node2D" parent="." unique_id=1841900403]
 
 [node name="SeatSprite" type="Sprite2D" parent="." unique_id=2062301053]
 position = Vector2(570, 518)
