@@ -14,9 +14,30 @@ extends Node2D
 # beneath the predator and its growing belly.
 @onready var flower_layer : Node2D = $FlowerLayer
 
+## Distance (in screen pixels) from the bottom of the seat sprite up to the middle
+## of its base footprint. Animals whose feet are above this line are "behind"
+## the seat and predator; below it, they're in front.
+@export var seat_footprint_offset : float = 42.0
+
+@onready var seat_sprite : Sprite2D = $SeatSprite
+@onready var predator : Node2D = $Predator
+@onready var cover : Node2D = $Cover
+
 
 func _ready():
+	apply_depth_sorting()
 	spawn_flowers()
+
+
+# Animals live in the same canvas as the seat/predator and set their z_index to
+# their feet Y (see edible.gd). Giving the seat and predator a z_index equal to
+# the seat's depth line makes farther animals draw behind them, nearer in front.
+func apply_depth_sorting():
+	var seat_bottom := seat_sprite.global_position.y + seat_sprite.get_rect().end.y * seat_sprite.scale.y
+	var depth_z := int(seat_bottom - seat_footprint_offset)
+	seat_sprite.z_index = depth_z
+	predator.z_index = depth_z
+	cover.z_index = depth_z
 
 
 func spawn_flowers():

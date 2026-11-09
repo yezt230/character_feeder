@@ -71,8 +71,7 @@ shape = SubResource("RectangleShape2D_skcvu")
 position = Vector2(574, -1158)
 shape = SubResource("RectangleShape2D_u3ntc")
 
-[node name="EdibleLayer" type="CanvasLayer" parent="." unique_id=2062295065]
-layer = 2
+[node name="EdibleLayer" type="Node2D" parent="." unique_id=2062295065]
 
 [node name="HUD" type="CanvasLayer" parent="." unique_id=31499115]
 
