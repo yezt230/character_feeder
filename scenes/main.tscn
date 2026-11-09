@@ -57,6 +57,7 @@ collision_mask = 0
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Ground" unique_id=57684275]
 position = Vector2(586, 598)
 shape = SubResource("RectangleShape2D_nxlau")
+disabled = true
 
 [node name="CollisionShape2D2" type="CollisionShape2D" parent="Ground" unique_id=1409297870]
 position = Vector2(1140, -253)

@@ -6,6 +6,9 @@ signal eaten
 @onready var edible_frame_controller = $EdibleFrameController
 @onready var running_timer: Timer = $EdibleFrameController/RunningTimer
 @onready var state_label = $StateLabel
+@onready var sprite: Sprite2D = $Sprite2D
+@onready var body_shape: CollisionShape2D = $CollisionShape2D
+@onready var hurtbox: Area2D = $EatenHurtbox
 
 enum State {
 	RESTING,
@@ -15,23 +18,98 @@ enum State {
 	EATEN
 }
 
-var current_state: State = State.FALLING
-var drag_offset := Vector2.ZERO
-var on_ground: bool = false
-var run_direction: int = 1
+# ----------------------------
+# PSEUDO-3D FIELD
+# ----------------------------
+# The walkable field is the full screen width and the bottom portion of the
+# screen height. An animal's "depth" is the screen Y of its feet within that
+# band: higher on screen = farther away (smaller, slower), lower = closer.
+
+## Fraction of the screen height (from the bottom) that animals can walk in.
+@export_range(0.05, 1.0, 0.01) var field_height_fraction: float = 0.3
+## Visual scale at the back (top) of the field.
+@export var far_scale: float = 0.55
+## Visual scale at the front (bottom) of the field.
+@export var near_scale: float = 1.1
+## Distance from the body's origin down to the animal's feet, at scale 1.
+@export var foot_offset: float = 66.0
+## Max vertical component of a run heading, relative to horizontal (0 = flat).
+@export_range(0.0, 1.0, 0.05) var max_vertical_ratio: float = 0.6
+## Depth movement appears slower on screen than sideways movement.
+@export_range(0.0, 1.0, 0.05) var vertical_speed_factor: float = 0.5
 
 const RUN_VELOCITY: float = 150.0
+const DRAG_Z_INDEX: int = 4000
+
+var current_state: State = State.FALLING
+var drag_offset := Vector2.ZERO
+var run_direction: int = 1
+var vertical_direction: float = 0.0
+
+# Feet Y of the spot on the field this animal stands on / will land on.
+var ground_y: float
+var depth_scale: float = 1.0
+
+# Original transforms of scaled children, so perspective scaling is relative.
+var base_sprite_scale: Vector2
+var base_shape_scale: Vector2
+var base_shape_position: Vector2
+var base_hurtbox_scale: Vector2
+
 
 func _ready():
 	freeze_mode = RigidBody2D.FREEZE_MODE_KINEMATIC
 
-	contact_monitor = true
-	max_contacts_reported = 10
+	base_sprite_scale = sprite.scale
+	base_shape_scale = body_shape.scale
+	base_shape_position = body_shape.position
+	base_hurtbox_scale = hurtbox.scale
+
+	# Pick a random spot on the field to land on.
+	var field := get_field_rect()
+	ground_y = randf_range(field.position.y, field.end.y)
+	apply_depth_scale()
 
 	running_timer.timeout.connect(_on_running_timer_timeout)
 	running_timer.stop()
 
 	enter_state(current_state)
+
+
+# ----------------------------
+# FIELD / PERSPECTIVE HELPERS
+# ----------------------------
+
+func get_field_rect() -> Rect2:
+	var screen := get_viewport().get_visible_rect()
+	var height := screen.size.y * field_height_fraction
+	return Rect2(screen.position.x, screen.end.y - height, screen.size.x, height)
+
+
+# 0 at the back of the field, 1 at the front.
+func get_depth_t(feet_y: float) -> float:
+	var field := get_field_rect()
+	return clampf(inverse_lerp(field.position.y, field.end.y, feet_y), 0.0, 1.0)
+
+
+func apply_depth_scale():
+	depth_scale = lerpf(far_scale, near_scale, get_depth_t(ground_y))
+	sprite.scale = base_sprite_scale * depth_scale
+	body_shape.scale = base_shape_scale * depth_scale
+	body_shape.position = base_shape_position * depth_scale
+	hurtbox.scale = base_hurtbox_scale * depth_scale
+
+	# Closer animals draw over farther ones (dragged ones draw on top of all).
+	if current_state != State.DRAGGING:
+		z_index = int(ground_y)
+
+
+func get_feet_y() -> float:
+	return global_position.y + foot_offset * depth_scale
+
+
+func set_feet_y(feet_y: float):
+	global_position.y = feet_y - foot_offset * depth_scale
 
 
 # ----------------------------
@@ -62,22 +140,26 @@ func enter_state(state: State):
 	state_label.text = str(state)
 	match state:
 		State.RESTING:
-			linear_velocity.x = 0.0
+			# Grounded animals are moved by hand, not by physics.
+			freeze = true
+			linear_velocity = Vector2.ZERO
 			edible_frame_controller.animal_on_ground()
 
 		State.RUNNING:
+			freeze = true
 			run_direction = [-1, 1].pick_random()
+			vertical_direction = randf_range(-max_vertical_ratio, max_vertical_ratio)
 			edible_frame_controller.set_facing_direction(run_direction)
 			edible_frame_controller.animal_running()
 
 		State.FALLING:
 			freeze = false
-			#linear_velocity.x = 0.0
 			edible_frame_controller.animal_in_air()
 
 		State.DRAGGING:
 			freeze = true
 			linear_velocity = Vector2.ZERO
+			z_index = DRAG_Z_INDEX
 			edible_frame_controller.animal_dragging()
 
 		State.EATEN:
@@ -88,11 +170,9 @@ func enter_state(state: State):
 
 func exit_state(state: State):
 	match state:
-		State.RUNNING:
-			linear_velocity.x = 0.0
-
 		State.DRAGGING:
 			freeze = false
+			z_index = int(ground_y)
 
 
 # ----------------------------
@@ -128,29 +208,55 @@ func _input(event):
 func _physics_process(delta):
 	match current_state:
 		State.RESTING:
-			if not is_on_ground():
-				change_state(State.FALLING)
+			set_feet_y(ground_y)
 
 		State.RUNNING:
-			if not is_on_ground():
-				change_state(State.FALLING)
-			else:
-				linear_velocity.x = RUN_VELOCITY * run_direction
+			move_on_field(delta)
 
 		State.FALLING:
-			if is_on_ground():
+			# Land once the feet reach this animal's spot on the field.
+			if linear_velocity.y >= 0.0 and get_feet_y() >= ground_y:
+				set_feet_y(ground_y)
 				change_state(State.RESTING)
 
 		State.DRAGGING:
 			global_position = get_global_mouse_position() + drag_offset
+			# Dragging over the field picks the depth it will be dropped at.
+			# Above the field it keeps the last depth and falls back to it.
+			var field := get_field_rect()
+			var feet_y := get_feet_y()
+			if feet_y >= field.position.y:
+				ground_y = minf(feet_y, field.end.y)
+				apply_depth_scale()
 
 		State.EATEN:
 			pass
 
 
-# Checks whether a contact is supporting the Edible.
-func is_on_ground() -> bool:
-	return on_ground
+func move_on_field(delta: float):
+	var field := get_field_rect()
+
+	# Farther animals move slower on screen, for perspective.
+	var speed := RUN_VELOCITY * depth_scale
+	global_position.x += run_direction * speed * delta
+	ground_y += vertical_direction * speed * vertical_speed_factor * delta
+
+	# Turn around at the front/back edges of the field.
+	if ground_y <= field.position.y or ground_y >= field.end.y:
+		ground_y = clampf(ground_y, field.position.y, field.end.y)
+		vertical_direction = -vertical_direction
+
+	apply_depth_scale()
+	set_feet_y(ground_y)
+
+	# Turn around at the left/right edges of the screen.
+	var half_width := sprite.get_rect().size.x * 0.5 * sprite.scale.x
+	var min_x := field.position.x + half_width
+	var max_x := field.end.x - half_width
+	if global_position.x <= min_x or global_position.x >= max_x:
+		global_position.x = clampf(global_position.x, min_x, max_x)
+		run_direction = -run_direction
+		edible_frame_controller.set_facing_direction(run_direction)
 
 
 # ----------------------------
@@ -162,17 +268,14 @@ func _on_running_timer_timeout():
 		return
 
 	if randf() <= 0.5:
+		# Re-enter RUNNING too, so a running animal can pick a new heading.
+		if current_state == State.RUNNING:
+			change_state(State.RESTING)
 		change_state(State.RUNNING)
 	else:
 		change_state(State.RESTING)
 
-func _integrate_forces(state: PhysicsDirectBodyState2D):
-	on_ground = false
-	for i in range(state.get_contact_count()):
-		var normal = state.get_contact_local_normal(i)
-		if normal.dot(Vector2.UP) > 0.7:
-			on_ground = true
-			break
+
 # ----------------------------
 # EATING
 # ----------------------------
