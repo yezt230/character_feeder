@@ -37,6 +37,7 @@ func apply_depth_sorting():
 	var depth_z := int(seat_bottom - seat_footprint_offset)
 	seat_sprite.z_index = depth_z
 	predator.z_index = depth_z
+	predator.depth_line_y = depth_z
 	cover.z_index = depth_z
 
 

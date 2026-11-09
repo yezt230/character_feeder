@@ -38,6 +38,9 @@ enum State {
 ## Depth movement appears slower on screen than sideways movement.
 @export_range(0.0, 1.0, 0.05) var vertical_speed_factor: float = 0.5
 
+## How long the grow/shrink to the neutral depth takes when grabbed.
+@export var grab_scale_duration: float = 0.5
+
 const RUN_VELOCITY: float = 150.0
 const DRAG_Z_INDEX: int = 4000
 
@@ -49,6 +52,11 @@ var vertical_direction: float = 0.0
 # Feet Y of the spot on the field this animal stands on / will land on.
 var ground_y: float
 var depth_scale: float = 1.0
+var depth_scale_tween: Tween
+# Scale at the moment of grabbing, so the grabbed point stays under the cursor.
+var grab_scale: float = 1.0
+
+@onready var predator: Node2D = get_tree().get_first_node_in_group("predator")
 
 # Original transforms of scaled children, so perspective scaling is relative.
 var base_sprite_scale: Vector2
@@ -92,16 +100,36 @@ func get_depth_t(feet_y: float) -> float:
 	return clampf(inverse_lerp(field.position.y, field.end.y, feet_y), 0.0, 1.0)
 
 
+func get_scale_at(feet_y: float) -> float:
+	return lerpf(far_scale, near_scale, get_depth_t(feet_y))
+
+
+# The neutral depth is the predator's depth line, kept inside the field.
+func get_neutral_depth() -> float:
+	var field := get_field_rect()
+	return clampf(predator.depth_line_y, field.position.y, field.end.y)
+
+
+# Snaps the visual scale to match the current ground depth.
 func apply_depth_scale():
-	depth_scale = lerpf(far_scale, near_scale, get_depth_t(ground_y))
+	set_depth_scale(get_scale_at(ground_y))
+
+	# Closer animals draw over farther ones (dragged ones draw on top of all).
+	if current_state != State.DRAGGING:
+		z_index = int(ground_y)
+
+
+func set_depth_scale(value: float):
+	depth_scale = value
 	sprite.scale = base_sprite_scale * depth_scale
 	body_shape.scale = base_shape_scale * depth_scale
 	body_shape.position = base_shape_position * depth_scale
 	hurtbox.scale = base_hurtbox_scale * depth_scale
 
-	# Closer animals draw over farther ones (dragged ones draw on top of all).
-	if current_state != State.DRAGGING:
-		z_index = int(ground_y)
+
+func stop_depth_scale_tween():
+	if depth_scale_tween:
+		depth_scale_tween.kill()
 
 
 func get_feet_y() -> float:
@@ -147,6 +175,8 @@ func enter_state(state: State):
 
 		State.RUNNING:
 			freeze = true
+			# Field movement drives the scale directly from here on.
+			stop_depth_scale_tween()
 			run_direction = [-1, 1].pick_random()
 			vertical_direction = randf_range(-max_vertical_ratio, max_vertical_ratio)
 			edible_frame_controller.set_facing_direction(run_direction)
@@ -160,6 +190,14 @@ func enter_state(state: State):
 			freeze = true
 			linear_velocity = Vector2.ZERO
 			z_index = DRAG_Z_INDEX
+			# Bring the animal to the neutral (predator) depth: it grows if it was
+			# farther away, shrinks if it was closer. It will land at this depth.
+			grab_scale = depth_scale
+			ground_y = get_neutral_depth()
+			stop_depth_scale_tween()
+			depth_scale_tween = create_tween()
+			depth_scale_tween.tween_method(set_depth_scale, depth_scale, get_scale_at(ground_y), grab_scale_duration) \
+				.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 			edible_frame_controller.animal_dragging()
 
 		State.EATEN:
@@ -220,14 +258,9 @@ func _physics_process(delta):
 				change_state(State.RESTING)
 
 		State.DRAGGING:
-			global_position = get_global_mouse_position() + drag_offset
-			# Dragging over the field picks the depth it will be dropped at.
-			# Above the field it keeps the last depth and falls back to it.
-			var field := get_field_rect()
-			var feet_y := get_feet_y()
-			if feet_y >= field.position.y:
-				ground_y = minf(feet_y, field.end.y)
-				apply_depth_scale()
+			# Scale the grab offset with the animal so the spot that was clicked
+			# stays under the cursor while it grows/shrinks.
+			global_position = get_global_mouse_position() + drag_offset * (depth_scale / grab_scale)
 
 		State.EATEN:
 			pass

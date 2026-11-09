@@ -17,6 +17,9 @@ extends Node2D
 @export var belly_tween_duration : float = 0.15
 
 var prey_eaten_count : int = 0
+# Screen Y of the predator/seat "depth line" (set by main.gd). Grabbed animals
+# are brought to this depth.
+var depth_line_y : float
 var gulping : bool = false
 var belly_base_scale : Vector2
 var belly_tween : Tween
