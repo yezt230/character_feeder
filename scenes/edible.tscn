@@ -5,6 +5,9 @@
 [ext_resource type="PackedScene" uid="uid://dp1ck8qb8jav7" path="res://scenes/edible_frame_controller.tscn" id="3_2kcqm"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_yleod"]
+size = Vector2(41, 39)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_drag"]
 size = Vector2(137, 127)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_7d04f"]
@@ -88,7 +91,6 @@ _data = {
 
 [node name="Edible" type="RigidBody2D" unique_id=739754446]
 collision_layer = 8
-input_pickable = true
 lock_rotation = true
 script = ExtResource("1_ycm2a")
 
@@ -101,9 +103,20 @@ vframes = 5
 position = Vector2(-2.5, 2.5)
 shape = SubResource("RectangleShape2D_yleod")
 
+[node name="DragArea" type="Area2D" parent="." unique_id=1288410537]
+collision_layer = 16
+collision_mask = 0
+monitoring = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DragArea" unique_id=906214773]
+position = Vector2(-2.5, 2.5)
+shape = SubResource("RectangleShape2D_drag")
+debug_color = Color(0.2, 0.75, 0.3, 0.42)
+
 [node name="EatenHurtbox" type="Area2D" parent="." unique_id=564095238]
 collision_layer = 4
 collision_mask = 2
+input_pickable = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="EatenHurtbox" unique_id=294645805]
 shape = SubResource("CircleShape2D_7d04f")
@@ -124,4 +137,5 @@ offset_right = 74.0
 offset_bottom = -48.0
 text = "test"
 
+[connection signal="input_event" from="DragArea" to="." method="_on_drag_area_input_event"]
 [connection signal="area_entered" from="EatenHurtbox" to="." method="_on_eaten_hurtbox_area_entered"]

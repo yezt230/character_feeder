@@ -9,6 +9,7 @@ signal eaten
 @onready var sprite: Sprite2D = $Sprite2D
 @onready var body_shape: CollisionShape2D = $CollisionShape2D
 @onready var hurtbox: Area2D = $EatenHurtbox
+@onready var drag_area: Area2D = $DragArea
 
 enum State {
 	RESTING,
@@ -63,6 +64,7 @@ var base_sprite_scale: Vector2
 var base_shape_scale: Vector2
 var base_shape_position: Vector2
 var base_hurtbox_scale: Vector2
+var base_drag_area_scale: Vector2
 
 
 func _ready():
@@ -72,6 +74,7 @@ func _ready():
 	base_shape_scale = body_shape.scale
 	base_shape_position = body_shape.position
 	base_hurtbox_scale = hurtbox.scale
+	base_drag_area_scale = drag_area.scale
 
 	# Pick a random spot on the field to land on.
 	var field := get_field_rect()
@@ -125,6 +128,7 @@ func set_depth_scale(value: float):
 	body_shape.scale = base_shape_scale * depth_scale
 	body_shape.position = base_shape_position * depth_scale
 	hurtbox.scale = base_hurtbox_scale * depth_scale
+	drag_area.scale = base_drag_area_scale * depth_scale
 
 
 func stop_depth_scale_tween():
@@ -217,7 +221,9 @@ func exit_state(state: State):
 # INPUT
 # ----------------------------
 
-func _input_event(viewport, event, shape_idx):
+# Clicks are picked up by DragArea, not the physics body, so the grab area
+# can be shaped independently of the floor/wall collision shape.
+func _on_drag_area_input_event(_viewport, event, _shape_idx):
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 
