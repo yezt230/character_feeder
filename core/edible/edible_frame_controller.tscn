@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://dp1ck8qb8jav7"]
 
-[ext_resource type="Script" uid="uid://bedde6iu5hyiv" path="res://scenes/edible_frame_controller.gd" id="1_kwjoo"]
+[ext_resource type="Script" uid="uid://bedde6iu5hyiv" path="res://core/edible/edible_frame_controller.gd" id="1_kwjoo"]
 
 [node name="EdibleFrameController" type="Node" unique_id=365543765]
 script = ExtResource("1_kwjoo")

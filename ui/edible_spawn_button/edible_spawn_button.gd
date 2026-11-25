@@ -1,7 +1,10 @@
 extends Button
+## HUD button that drops an edible into the Playfield when pressed.
 
 @export var edible_scene : PackedScene
-@onready var predator = get_tree().get_first_node_in_group("predator")				
+## The Playfield to spawn into. Falls back to the first node in the
+## "playfield" group if left empty.
+@export var playfield : Playfield
 @onready var button_sprite = $ButtonSprite
 @onready var audio_stream_player = $AudioStreamPlayer
 @onready var spawn_marker_2d = $SpawnMarker2D
@@ -12,18 +15,13 @@ var button_scale_y_const : float
 func _ready():
 	button_scale_x_const = button_sprite.scale.x
 	button_scale_y_const = button_sprite.scale.y
-	print([button_scale_x_const, button_scale_y_const])
+	if playfield == null:
+		playfield = get_tree().get_first_node_in_group("playfield")
 
 
 func spawn_edible():
 	audio_stream_player.play_randomized_pitch()
-	var edible_instance = edible_scene.instantiate()
-	#edible_instance.global_position = spawn_marker_2d.global_position
-	edible_instance.global_position = get_spawn_position()
-	edible_instance.eaten.connect(predator._on_edible_eaten)	
-	var main = get_tree().current_scene
-	var edible_layer = get_tree().current_scene.get_node("EdibleLayer")
-	edible_layer.add_child(edible_instance)
+	playfield.spawn_edible(edible_scene, get_spawn_position())
 
 
 func _on_pressed():

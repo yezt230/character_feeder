@@ -1,0 +1,152 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://modes/tower_defense/tower_defense.gd" id="1_mode"]
+[ext_resource type="PackedScene" path="res://core/playfield/playfield.tscn" id="2_field"]
+[ext_resource type="Script" path="res://modes/tower_defense/wave_spawner.gd" id="3_waves"]
+[ext_resource type="PackedScene" uid="uid://bwr6mdlsu24tp" path="res://core/edible/edible.tscn" id="4_edible"]
+[ext_resource type="Theme" uid="uid://bfujsoaj35gw8" path="res://ui/hud_theme.tres" id="5_theme"]
+[ext_resource type="PackedScene" uid="uid://dwhe0qvm2myce" path="res://ui/reset_button/reset_button.tscn" id="6_reset"]
+[ext_resource type="PackedScene" path="res://ui/back_to_menu_button/back_to_menu_button.tscn" id="7_menu"]
+
+[node name="TowerDefense" type="Node2D" unique_id=1196532017]
+script = ExtResource("1_mode")
+
+[node name="Playfield" parent="." unique_id=1530419876 instance=ExtResource("2_field")]
+edibles_escape_off_screen = true
+
+[node name="WaveSpawner" type="Node" parent="." unique_id=1402981734 node_paths=PackedStringArray("playfield")]
+script = ExtResource("3_waves")
+playfield = NodePath("../Playfield")
+edible_scene = ExtResource("4_edible")
+
+[node name="HUD" type="CanvasLayer" parent="." unique_id=1847716205]
+
+[node name="MarginContainer" type="MarginContainer" parent="HUD" unique_id=1284760934]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("5_theme")
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 24
+
+[node name="HBoxContainer" type="HBoxContainer" parent="HUD/MarginContainer" unique_id=1640981137]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="StatsVBoxContainer" type="VBoxContainer" parent="HUD/MarginContainer/HBoxContainer" unique_id=1093384519]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="WaveLabel" type="Label" parent="HUD/MarginContainer/HBoxContainer/StatsVBoxContainer" unique_id=1366051782]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0.15, 0.15, 0.15, 1)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 28
+text = "Wave 0 / 0"
+
+[node name="LivesLabel" type="Label" parent="HUD/MarginContainer/HBoxContainer/StatsVBoxContainer" unique_id=1873360128]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0.15, 0.15, 0.15, 1)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 28
+text = "Lives: 0"
+
+[node name="ScoreLabel" type="Label" parent="HUD/MarginContainer/HBoxContainer/StatsVBoxContainer" unique_id=1195624378]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0.15, 0.15, 0.15, 1)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 28
+text = "Eaten: 0"
+
+[node name="RightVBoxContainer" type="VBoxContainer" parent="HUD/MarginContainer/HBoxContainer" unique_id=1559027431]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 24
+
+[node name="ResetButton" parent="HUD/MarginContainer/HBoxContainer/RightVBoxContainer" unique_id=1022410588 instance=ExtResource("6_reset")]
+layout_mode = 2
+size_flags_horizontal = 8
+
+[node name="BackToMenuButton" parent="HUD/MarginContainer/HBoxContainer/RightVBoxContainer" unique_id=1774019253 instance=ExtResource("7_menu")]
+layout_mode = 2
+size_flags_horizontal = 8
+
+[node name="WaveBanner" type="Label" parent="HUD" unique_id=1990275341]
+unique_name_in_owner = true
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 90.0
+offset_bottom = 170.0
+grow_horizontal = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0.15, 0.15, 0.15, 1)
+theme_override_constants/outline_size = 12
+theme_override_font_sizes/font_size = 56
+text = "Wave 1"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="EndPanel" type="CenterContainer" parent="HUD" unique_id=1238105967]
+unique_name_in_owner = true
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("5_theme")
+
+[node name="PanelContainer" type="PanelContainer" parent="HUD/EndPanel" unique_id=1460331652]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="HUD/EndPanel/PanelContainer" unique_id=1120779386]
+layout_mode = 2
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 32
+theme_override_constants/margin_bottom = 24
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HUD/EndPanel/PanelContainer/MarginContainer" unique_id=1316207914]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="EndLabel" type="Label" parent="HUD/EndPanel/PanelContainer/MarginContainer/VBoxContainer" unique_id=1687352281]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "Game over"
+horizontal_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="HUD/EndPanel/PanelContainer/MarginContainer/VBoxContainer" unique_id=1915544620]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 16
+
+[node name="RetryButton" type="Button" parent="HUD/EndPanel/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1032266391]
+custom_minimum_size = Vector2(110, 44)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Retry"
+
+[node name="MenuButton" type="Button" parent="HUD/EndPanel/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1543286611]
+custom_minimum_size = Vector2(110, 44)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Menu"
+
+[connection signal="pressed" from="HUD/EndPanel/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/RetryButton" to="." method="restart"]
+[connection signal="pressed" from="HUD/EndPanel/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/MenuButton" to="." method="back_to_menu"]

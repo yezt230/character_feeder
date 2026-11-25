@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://djdgtrvy7rnh2"]
 
-[ext_resource type="Theme" uid="uid://bfujsoaj35gw8" path="res://hud_theme.tres" id="1_3hq8g"]
-[ext_resource type="Script" uid="uid://n7txg86l1nab" path="res://scenes/button.gd" id="1_246e8"]
+[ext_resource type="Theme" uid="uid://bfujsoaj35gw8" path="res://ui/hud_theme.tres" id="1_3hq8g"]
+[ext_resource type="Script" uid="uid://n7txg86l1nab" path="res://ui/image_uploader/image_uploader.gd" id="1_246e8"]
 
 [node name="ImageUploader" type="Control" unique_id=505353900]
 layout_mode = 3

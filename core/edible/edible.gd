@@ -1,7 +1,9 @@
-
+class_name Edible
 extends RigidBody2D
 
 signal eaten
+## Emitted when the animal runs off the screen (only if escape_off_screen).
+signal escaped
 
 @onready var edible_frame_controller = $EdibleFrameController
 @onready var running_timer: Timer = $EdibleFrameController/RunningTimer
@@ -16,18 +18,17 @@ enum State {
 	RUNNING,
 	FALLING,
 	DRAGGING,
-	EATEN
+	EATEN,
+	ESCAPED
 }
 
 # ----------------------------
 # PSEUDO-3D FIELD
 # ----------------------------
-# The walkable field is the full screen width and the bottom portion of the
-# screen height. An animal's "depth" is the screen Y of its feet within that
-# band: higher on screen = farther away (smaller, slower), lower = closer.
-
-## Fraction of the screen height (from the bottom) that animals can walk in.
-@export_range(0.05, 1.0, 0.01) var field_height_fraction: float = 0.3
+# The walkable field (owned by the Playfield) is the full screen width and the
+# bottom portion of the screen height. An animal's "depth" is the screen Y of
+# its feet within that band: higher on screen = farther away (smaller, slower),
+# lower = closer.
 ## Visual scale at the back (top) of the field.
 @export var far_scale: float = 0.55
 ## Visual scale at the front (bottom) of the field.
@@ -57,7 +58,11 @@ var depth_scale_tween: Tween
 # Scale at the moment of grabbing, so the grabbed point stays under the cursor.
 var grab_scale: float = 1.0
 
-@onready var predator: Node2D = get_tree().get_first_node_in_group("predator")
+## The Playfield this animal lives in. Set by Playfield.spawn_edible().
+var playfield: Playfield
+## Run off the left/right screen edges instead of turning around.
+## Set by Playfield.spawn_edible() from the playfield's configuration.
+var escape_off_screen: bool = false
 
 # Original transforms of scaled children, so perspective scaling is relative.
 var base_sprite_scale: Vector2
@@ -69,6 +74,10 @@ var base_drag_area_scale: Vector2
 
 func _ready():
 	freeze_mode = RigidBody2D.FREEZE_MODE_KINEMATIC
+
+	if playfield == null:
+		playfield = get_tree().get_first_node_in_group("playfield")
+		assert(playfield != null, "Edible needs a Playfield; spawn it with Playfield.spawn_edible().")
 
 	base_sprite_scale = sprite.scale
 	base_shape_scale = body_shape.scale
@@ -92,9 +101,7 @@ func _ready():
 # ----------------------------
 
 func get_field_rect() -> Rect2:
-	var screen := get_viewport().get_visible_rect()
-	var height := screen.size.y * field_height_fraction
-	return Rect2(screen.position.x, screen.end.y - height, screen.size.x, height)
+	return playfield.get_field_rect()
 
 
 # 0 at the back of the field, 1 at the front.
@@ -107,10 +114,8 @@ func get_scale_at(feet_y: float) -> float:
 	return lerpf(far_scale, near_scale, get_depth_t(feet_y))
 
 
-# The neutral depth is the predator's depth line, kept inside the field.
 func get_neutral_depth() -> float:
-	var field := get_field_rect()
-	return clampf(predator.depth_line_y, field.position.y, field.end.y)
+	return playfield.get_neutral_depth()
 
 
 # Snaps the visual scale to match the current ground depth.
@@ -152,7 +157,7 @@ func change_state(new_state: State):
 	if current_state == new_state:
 		return
 
-	if current_state == State.EATEN:
+	if current_state == State.EATEN or current_state == State.ESCAPED:
 		return
 
 	exit_state(current_state)
@@ -209,6 +214,11 @@ func enter_state(state: State):
 			eaten.emit()
 			queue_free()
 
+		State.ESCAPED:
+			running_timer.stop()
+			escaped.emit()
+			queue_free()
+
 
 func exit_state(state: State):
 	match state:
@@ -227,7 +237,7 @@ func _on_drag_area_input_event(_viewport, event, _shape_idx):
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 
-			if current_state == State.EATEN:
+			if current_state == State.EATEN or current_state == State.ESCAPED:
 				return
 
 			drag_offset = global_position - get_global_mouse_position()
@@ -268,7 +278,7 @@ func _physics_process(delta):
 			# stays under the cursor while it grows/shrinks.
 			global_position = get_global_mouse_position() + drag_offset * (depth_scale / grab_scale)
 
-		State.EATEN:
+		State.EATEN, State.ESCAPED:
 			pass
 
 
@@ -288,8 +298,15 @@ func move_on_field(delta: float):
 	apply_depth_scale()
 	set_feet_y(ground_y)
 
-	# Turn around at the left/right edges of the screen.
 	var half_width := sprite.get_rect().size.x * 0.5 * sprite.scale.x
+
+	# Escaping animals keep going until they're fully off-screen.
+	if escape_off_screen:
+		if global_position.x < field.position.x - half_width or global_position.x > field.end.x + half_width:
+			change_state(State.ESCAPED)
+		return
+
+	# Turn around at the left/right edges of the screen.
 	var min_x := field.position.x + half_width
 	var max_x := field.end.x - half_width
 	if global_position.x <= min_x or global_position.x >= max_x:

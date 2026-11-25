@@ -1,10 +1,10 @@
 [gd_scene format=3 uid="uid://ig2gl8s20vf8"]
 
-[ext_resource type="Script" uid="uid://bcuecjiwtkhqb" path="res://scenes/edible_spawner.gd" id="1_cikm8"]
+[ext_resource type="Script" uid="uid://bcuecjiwtkhqb" path="res://ui/edible_spawn_button/edible_spawn_button.gd" id="1_cikm8"]
 [ext_resource type="Texture2D" uid="uid://dorjmaxulhbwy" path="res://assets/rabbit-face-line-art-icon-vector-58758766.jpg" id="2_kkxgs"]
-[ext_resource type="PackedScene" uid="uid://bwr6mdlsu24tp" path="res://scenes/edible.tscn" id="2_nkltu"]
+[ext_resource type="PackedScene" uid="uid://bwr6mdlsu24tp" path="res://core/edible/edible.tscn" id="2_nkltu"]
 [ext_resource type="AudioStream" uid="uid://cutxugv8krikk" path="res://sounds/pop.mp3" id="4_nkltu"]
-[ext_resource type="Script" uid="uid://c8t27iux4fv4u" path="res://scenes/audio_stream_player.gd" id="5_bckns"]
+[ext_resource type="Script" uid="uid://c8t27iux4fv4u" path="res://core/audio/random_pitch_audio_player.gd" id="5_bckns"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nkltu"]
 bg_color = Color(1, 1, 1, 1)
@@ -27,7 +27,7 @@ corner_radius_top_right = 12
 corner_radius_bottom_right = 12
 corner_radius_bottom_left = 12
 
-[node name="EdibleSpawner" type="Button" unique_id=2095343811]
+[node name="EdibleSpawnButton" type="Button" unique_id=2095343811]
 custom_minimum_size = Vector2(160, 160)
 offset_right = 8.0
 offset_bottom = 8.0

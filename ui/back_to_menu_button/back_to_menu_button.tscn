@@ -1,0 +1,11 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://ui/back_to_menu_button/back_to_menu_button.gd" id="1_menu"]
+[ext_resource type="Theme" uid="uid://bfujsoaj35gw8" path="res://ui/hud_theme.tres" id="2_theme"]
+
+[node name="BackToMenuButton" type="Button" unique_id=1774019253]
+custom_minimum_size = Vector2(70, 40)
+theme = ExtResource("2_theme")
+theme_override_font_sizes/font_size = 20
+text = "Menu"
+script = ExtResource("1_menu")

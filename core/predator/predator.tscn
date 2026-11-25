@@ -1,8 +1,8 @@
 [gd_scene format=3 uid="uid://bwr68vk0lhb8r"]
 
-[ext_resource type="Script" uid="uid://bbiipyu7vbxtt" path="res://scenes/predator.gd" id="1_8or0i"]
+[ext_resource type="Script" uid="uid://bbiipyu7vbxtt" path="res://core/predator/predator.gd" id="1_8or0i"]
 [ext_resource type="Texture2D" uid="uid://cc64drvypvlxx" path="res://assets/pred.png" id="2_wacsr"]
-[ext_resource type="Shader" uid="uid://jy87myry1sd0" path="res://scenes/belly_outline.gdshader" id="3_koidv"]
+[ext_resource type="Shader" uid="uid://jy87myry1sd0" path="res://core/predator/belly_outline.gdshader" id="3_koidv"]
 [ext_resource type="AudioStream" uid="uid://bsm4vtqrl7y0l" path="res://sounds/gulp11-weirddeep.wav" id="4_q77xh"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_koidv"]

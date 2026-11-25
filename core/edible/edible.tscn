@@ -1,8 +1,8 @@
 [gd_scene format=3 uid="uid://bwr6mdlsu24tp"]
 
 [ext_resource type="Texture2D" uid="uid://c1kq3kxd1d1yd" path="res://assets/prey_spritesheet.png" id="1_fpjhs"]
-[ext_resource type="Script" uid="uid://broelvwtw4q03" path="res://scenes/edible.gd" id="1_ycm2a"]
-[ext_resource type="PackedScene" uid="uid://dp1ck8qb8jav7" path="res://scenes/edible_frame_controller.tscn" id="3_2kcqm"]
+[ext_resource type="Script" uid="uid://broelvwtw4q03" path="res://core/edible/edible.gd" id="1_ycm2a"]
+[ext_resource type="PackedScene" uid="uid://dp1ck8qb8jav7" path="res://core/edible/edible_frame_controller.tscn" id="3_2kcqm"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_yleod"]
 size = Vector2(41, 39)

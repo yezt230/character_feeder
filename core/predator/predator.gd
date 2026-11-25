@@ -1,3 +1,4 @@
+class_name Predator
 extends Node2D
 
 @onready var belly = $Visuals/Belly
@@ -5,7 +6,6 @@ extends Node2D
 @onready var body_animation_player = $BodyAnimationPlayer
 @onready var belly_animation_player = $BellyAnimationPlayer
 @onready var audio_stream_player = $AudioStreamPlayer
-@onready var cover = $"../Cover"
 
 ## Belly growth uses diminishing returns: each meal closes a fixed fraction
 ## of the remaining gap to a maximum size, so growth slows as more prey is eaten.
@@ -15,10 +15,12 @@ extends Node2D
 ## Closer to 1 = slower falloff. With 0.933 the first meal adds ~0.1 scale.
 @export_range(0.0, 1.0, 0.001) var belly_growth_decay : float = 0.933
 @export var belly_tween_duration : float = 0.15
+## Optional node hidden in front of the predator that is removed after a few meals.
+@export var cover : Node2D
 
 var prey_eaten_count : int = 0
-# Screen Y of the predator/seat "depth line" (set by main.gd). Grabbed animals
-# are brought to this depth.
+# Screen Y of the predator/seat "depth line" . Grabbed animals
+# are brought to this depth. Set by the Playfield.
 var depth_line_y : float
 var gulping : bool = false
 var belly_base_scale : Vector2
@@ -28,7 +30,8 @@ var belly_tween : Tween
 func _ready():
 	belly_base_scale = belly.scale
 
-func _on_edible_eaten():
+## Called by the Playfield whenever one of its edibles is eaten.
+func on_edible_eaten():
 	gulping = true
 	play_gulp_animation()
 	
@@ -45,7 +48,7 @@ func increase_belly_size():
 	belly_tween.tween_property(belly, "scale", get_belly_target_scale(), belly_tween_duration)
 
 	if prey_eaten_count >= 3:
-		if cover:
+		if is_instance_valid(cover):
 			cover.queue_free()
 
 

@@ -1,0 +1,98 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" uid="uid://b1p87yjgw6myc" path="res://core/playfield/playfield.gd" id="1_play"]
+[ext_resource type="Texture2D" uid="uid://co1p3dt412ug5" path="res://assets/bg.png" id="2_bg"]
+[ext_resource type="PackedScene" uid="uid://4f3bmp5ga4r8" path="res://core/scenery/flower_sprite.tscn" id="3_flower"]
+[ext_resource type="Texture2D" uid="uid://ehto7a7e54sb" path="res://assets/seat.png" id="4_seat"]
+[ext_resource type="PackedScene" uid="uid://bwr68vk0lhb8r" path="res://core/predator/predator.tscn" id="5_pred"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_nxlau"]
+size = Vector2(1211, 20)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_7d04f"]
+size = Vector2(16, 1784)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_skcvu"]
+size = Vector2(13.5, 1791)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_u3ntc"]
+size = Vector2(1134, 58)
+
+[node name="Playfield" type="Node2D" unique_id=1530419876 groups=["playfield"]]
+script = ExtResource("1_play")
+flower = ExtResource("3_flower")
+
+[node name="Background" type="Node2D" parent="." unique_id=1811240613]
+
+[node name="BGSprite" type="Sprite2D" parent="Background" unique_id=468305354]
+position = Vector2(578, 325)
+scale = Vector2(0.9, 0.9)
+texture = ExtResource("2_bg")
+
+[node name="Tint" type="ColorRect" parent="Background" unique_id=1661709192]
+custom_minimum_size = Vector2(1153, 700)
+offset_top = -1.0
+offset_right = 1153.0
+offset_bottom = 699.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+mouse_filter = 2
+color = Color(0, 0, 0, 0.09411765)
+metadata/_edit_use_anchors_ = true
+
+[node name="FlowerLayer" type="Node2D" parent="." unique_id=1841900403]
+
+[node name="SeatSprite" type="Sprite2D" parent="." unique_id=2062301053]
+position = Vector2(570, 518)
+scale = Vector2(0.9, 0.9)
+texture = ExtResource("4_seat")
+
+[node name="Predator" parent="." unique_id=493401095 node_paths=PackedStringArray("cover") instance=ExtResource("5_pred")]
+position = Vector2(579, 438)
+cover = NodePath("../Cover")
+
+[node name="Walls" type="StaticBody2D" parent="." unique_id=1041349482 groups=["floor"]]
+collision_mask = 0
+
+[node name="Floor" type="CollisionShape2D" parent="Walls" unique_id=57684275]
+position = Vector2(586, 598)
+shape = SubResource("RectangleShape2D_nxlau")
+disabled = true
+
+[node name="RightWall" type="CollisionShape2D" parent="Walls" unique_id=1409297870]
+position = Vector2(1140, -253)
+shape = SubResource("RectangleShape2D_7d04f")
+
+[node name="LeftWall" type="CollisionShape2D" parent="Walls" unique_id=1912114987]
+position = Vector2(10.25, -244.5)
+shape = SubResource("RectangleShape2D_skcvu")
+
+[node name="Ceiling" type="CollisionShape2D" parent="Walls" unique_id=1128390419]
+position = Vector2(574, -1158)
+shape = SubResource("RectangleShape2D_u3ntc")
+
+[node name="EdibleLayer" type="Node2D" parent="." unique_id=2062295065]
+
+[node name="Cover" type="Node2D" parent="." unique_id=487373303]
+visible = false
+
+[node name="ColorRect" type="ColorRect" parent="Cover" unique_id=97745311]
+offset_left = 501.0
+offset_top = 358.0
+offset_right = 561.0
+offset_bottom = 398.0
+color = Color(0.6156863, 0.6156863, 0.6156863, 1)
+
+[node name="ColorRect2" type="ColorRect" parent="Cover" unique_id=158296936]
+offset_left = 528.0
+offset_top = 359.0
+offset_right = 588.0
+offset_bottom = 399.0
+color = Color(0.6156863, 0.6156863, 0.6156863, 1)
+
+[node name="ColorRect3" type="ColorRect" parent="Cover" unique_id=445551644]
+offset_left = 548.0
+offset_top = 368.0
+offset_right = 608.0
+offset_bottom = 408.0
+color = Color(0.6156863, 0.6156863, 0.6156863, 1)
