@@ -22,9 +22,6 @@ size = Vector2(13.5, 1791)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_u3ntc"]
 size = Vector2(1134, 58)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_787so"]
-size = Vector2(303, 117)
-
 [node name="Main" type="Node2D" unique_id=1080789217]
 script = ExtResource("1_tipki")
 flower = ExtResource("2_85g3d")
@@ -138,11 +135,3 @@ offset_top = 368.0
 offset_right = 608.0
 offset_bottom = 408.0
 color = Color(0.6156863, 0.6156863, 0.6156863, 1)
-
-[node name="SeatHitboxArea" type="Area2D" parent="." unique_id=915945082]
-collision_layer = 16
-collision_mask = 0
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="SeatHitboxArea" unique_id=455266907]
-position = Vector2(568.5, 566.5)
-shape = SubResource("RectangleShape2D_787so")

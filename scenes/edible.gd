@@ -38,9 +38,6 @@ enum State {
 ## Depth movement appears slower on screen than sideways movement.
 @export_range(0.0, 1.0, 0.05) var vertical_speed_factor: float = 0.5
 
-## Physics layers of the Area2Ds that mark ground animals can't walk on
-## (e.g. the seat's base). Checked at the animal's feet. Layer 5 = "Seathitbox".
-@export_flags_2d_physics var obstacle_mask: int = 16
 ## How long the grow/shrink to the neutral depth takes when grabbed.
 @export var grab_scale_duration: float = 0.5
 
@@ -67,9 +64,6 @@ var base_shape_scale: Vector2
 var base_shape_position: Vector2
 var base_hurtbox_scale: Vector2
 
-# Reused point query for checking the feet against obstacle areas.
-var obstacle_query := PhysicsPointQueryParameters2D.new()
-
 
 func _ready():
 	freeze_mode = RigidBody2D.FREEZE_MODE_KINEMATIC
@@ -78,10 +72,6 @@ func _ready():
 	base_shape_scale = body_shape.scale
 	base_shape_position = body_shape.position
 	base_hurtbox_scale = hurtbox.scale
-
-	obstacle_query.collision_mask = obstacle_mask
-	obstacle_query.collide_with_areas = true
-	obstacle_query.collide_with_bodies = false
 
 	# Pick a random spot on the field to land on.
 	var field := get_field_rect()
@@ -142,44 +132,6 @@ func stop_depth_scale_tween():
 		depth_scale_tween.kill()
 
 
-# ----------------------------
-# OBSTACLES
-# ----------------------------
-# Obstacles are Area2Ds on obstacle_mask's layers. An animal's feet
-# (screen X, ground Y) may not move into one.
-
-func is_blocked(feet: Vector2) -> bool:
-	obstacle_query.position = feet
-	return not get_world_2d().direct_space_state.intersect_point(obstacle_query, 1).is_empty()
-
-
-# If this animal is set to land inside an obstacle, move its landing depth to
-# the nearest free spot at the same X: in front first, then behind.
-# Returns true if the landing spot changed.
-func resolve_landing_spot() -> bool:
-	if not is_blocked(Vector2(global_position.x, ground_y)):
-		return false
-
-	var field := get_field_rect()
-	var step := 4.0
-
-	var y := ground_y
-	while y < field.end.y:
-		y = minf(y + step, field.end.y)
-		if not is_blocked(Vector2(global_position.x, y)):
-			ground_y = y
-			return true
-
-	y = ground_y
-	while y > field.position.y:
-		y = maxf(y - step, field.position.y)
-		if not is_blocked(Vector2(global_position.x, y)):
-			ground_y = y
-			return true
-
-	return false
-
-
 func get_feet_y() -> float:
 	return global_position.y + foot_offset * depth_scale
 
@@ -232,14 +184,6 @@ func enter_state(state: State):
 
 		State.FALLING:
 			freeze = false
-			# Don't land inside an obstacle: shift to a free depth and ease the
-			# size to match while falling.
-			if resolve_landing_spot():
-				z_index = int(ground_y)
-				stop_depth_scale_tween()
-				depth_scale_tween = create_tween()
-				depth_scale_tween.tween_method(set_depth_scale, depth_scale, get_scale_at(ground_y), grab_scale_duration) \
-					.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 			edible_frame_controller.animal_in_air()
 
 		State.DRAGGING:
@@ -327,28 +271,13 @@ func move_on_field(delta: float):
 
 	# Farther animals move slower on screen, for perspective.
 	var speed := RUN_VELOCITY * depth_scale
-	var new_x := global_position.x + run_direction * speed * delta
-	var new_y := ground_y + vertical_direction * speed * vertical_speed_factor * delta
+	global_position.x += run_direction * speed * delta
+	ground_y += vertical_direction * speed * vertical_speed_factor * delta
 
 	# Turn around at the front/back edges of the field.
-	if new_y <= field.position.y or new_y >= field.end.y:
-		new_y = clampf(new_y, field.position.y, field.end.y)
+	if ground_y <= field.position.y or ground_y >= field.end.y:
+		ground_y = clampf(ground_y, field.position.y, field.end.y)
 		vertical_direction = -vertical_direction
-
-	# Don't walk into obstacles. Each axis is checked separately, so an animal
-	# turns away on the blocked axis and keeps sliding along the other.
-	# (If it's somehow already inside one, let it walk out freely.)
-	if not is_blocked(Vector2(global_position.x, ground_y)):
-		if is_blocked(Vector2(new_x, ground_y)):
-			new_x = global_position.x
-			run_direction = -run_direction
-			edible_frame_controller.set_facing_direction(run_direction)
-		if is_blocked(Vector2(new_x, new_y)):
-			new_y = ground_y
-			vertical_direction = -vertical_direction
-
-	global_position.x = new_x
-	ground_y = new_y
 
 	apply_depth_scale()
 	set_feet_y(ground_y)
