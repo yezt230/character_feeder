@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://bdm1bwo0j4bnf"]
 
-[ext_resource type="Script" path="res://main/main.gd" id="1_main"]
+[ext_resource type="Script" uid="uid://cp40kjf5lstin" path="res://main/main.gd" id="1_main"]
 [ext_resource type="Theme" uid="uid://bfujsoaj35gw8" path="res://ui/hud_theme.tres" id="2_theme"]
 [ext_resource type="Texture2D" uid="uid://co1p3dt412ug5" path="res://assets/bg.png" id="3_bg"]
 [ext_resource type="PackedScene" path="res://modes/free_play/free_play.tscn" id="4_free"]
@@ -17,6 +17,7 @@ theme = ExtResource("2_theme")
 script = ExtResource("1_main")
 free_play_scene = ExtResource("4_free")
 tower_defense_scene = ExtResource("5_td")
+auto_start_scene = ExtResource("4_free")
 
 [node name="Background" type="TextureRect" parent="." unique_id=1288637102]
 layout_mode = 1
