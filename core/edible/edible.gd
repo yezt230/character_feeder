@@ -40,6 +40,11 @@ enum State {
 ## Depth movement appears slower on screen than sideways movement.
 @export_range(0.0, 1.0, 0.05) var vertical_speed_factor: float = 0.5
 
+## Physics layers that block animals while they walk on the field (e.g. the
+## predator's body). Falling animals collide with these through normal physics;
+## walking animals are moved by hand, so they test for them before each step.
+@export_flags_2d_physics var obstacle_mask: int = 32
+
 ## How long the grow/shrink to the neutral depth takes when grabbed.
 @export var grab_scale_duration: float = 0.5
 
@@ -287,8 +292,23 @@ func move_on_field(delta: float):
 
 	# Farther animals move slower on screen, for perspective.
 	var speed := RUN_VELOCITY * depth_scale
-	global_position.x += run_direction * speed * delta
-	ground_y += vertical_direction * speed * vertical_speed_factor * delta
+	var step_x := run_direction * speed * delta
+	var step_depth := vertical_direction * speed * vertical_speed_factor * delta
+
+	# Obstacles (e.g. the predator's body) turn the animal around, like walls.
+	# If it's already overlapping one, let it walk free instead of jittering.
+	var check_obstacles := not is_blocked_at(global_position)
+
+	if check_obstacles and is_blocked_at(global_position + Vector2(step_x, 0.0)):
+		run_direction = -run_direction
+		edible_frame_controller.set_facing_direction(run_direction)
+	else:
+		global_position.x += step_x
+
+	if check_obstacles and is_blocked_at(global_position + Vector2(0.0, step_depth)):
+		vertical_direction = -vertical_direction
+	else:
+		ground_y += step_depth
 
 	# Turn around at the front/back edges of the field.
 	if ground_y <= field.position.y or ground_y >= field.end.y:
@@ -313,6 +333,20 @@ func move_on_field(delta: float):
 		global_position.x = clampf(global_position.x, min_x, max_x)
 		run_direction = -run_direction
 		edible_frame_controller.set_facing_direction(run_direction)
+
+
+# True if this animal's body shape, moved to the given body position, would
+# overlap anything on obstacle_mask.
+func is_blocked_at(body_position: Vector2) -> bool:
+	if obstacle_mask == 0:
+		return false
+	var query := PhysicsShapeQueryParameters2D.new()
+	query.shape = body_shape.shape
+	query.transform = body_shape.global_transform.translated(body_position - global_position)
+	query.collision_mask = obstacle_mask
+	query.collide_with_areas = false
+	query.exclude = [get_rid()]
+	return not get_world_2d().direct_space_state.intersect_shape(query, 1).is_empty()
 
 
 # ----------------------------

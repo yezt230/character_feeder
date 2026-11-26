@@ -270,6 +270,7 @@ stream = ExtResource("4_q77xh")
 bus = &"SFX"
 
 [node name="BodyCollision" type="StaticBody2D" parent="." unique_id=1211106705]
+collision_layer = 32
 collision_mask = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="BodyCollision" unique_id=981985762]
