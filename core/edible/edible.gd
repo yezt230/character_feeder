@@ -44,6 +44,9 @@ enum State {
 ## predator's body). Falling animals collide with these through normal physics;
 ## walking animals are moved by hand, so they test for them before each step.
 @export_flags_2d_physics var obstacle_mask: int = 32
+## Sideways speed at which a falling animal slides off the top of an obstacle,
+## so animals can never sit on top of the predator.
+@export var obstacle_slide_speed: float = 250.0
 
 ## How long the grow/shrink to the neutral depth takes when grabbed.
 @export var grab_scale_duration: float = 0.5
@@ -273,6 +276,8 @@ func _physics_process(delta):
 			move_on_field(delta)
 
 		State.FALLING:
+			slide_off_obstacles()
+
 			# Land once the feet reach this animal's spot on the field.
 			if linear_velocity.y >= 0.0 and get_feet_y() >= ground_y:
 				set_feet_y(ground_y)
@@ -347,6 +352,40 @@ func is_blocked_at(body_position: Vector2) -> bool:
 	query.collide_with_areas = false
 	query.exclude = [get_rid()]
 	return not get_world_2d().direct_space_state.intersect_shape(query, 1).is_empty()
+
+
+# If this falling animal is resting on top of an obstacle, push it sideways off
+# the edge. Gravity alone can leave it balanced on a shallow curve.
+func slide_off_obstacles():
+	if obstacle_mask == 0:
+		return
+
+	# Probe just below the animal for an obstacle surface it's standing on.
+	var query := PhysicsShapeQueryParameters2D.new()
+	query.shape = body_shape.shape
+	query.transform = body_shape.global_transform.translated(Vector2(0.0, 2.0))
+	query.collision_mask = obstacle_mask
+	query.collide_with_areas = false
+	query.exclude = [get_rid()]
+	var contact := get_world_2d().direct_space_state.get_rest_info(query)
+	if contact.is_empty():
+		return
+
+	# Normal points from the obstacle toward the animal. Only react to surfaces
+	# underneath it, not obstacles it is falling past on the side.
+	var normal: Vector2 = contact.normal
+	if normal.y > -0.1:
+		return
+
+	# Slide down the slope; at the very top, slide away from the contact point.
+	var direction := signf(normal.x)
+	if absf(normal.x) < 0.05:
+		direction = signf(global_position.x - contact.point.x)
+	if direction == 0.0:
+		direction = [-1.0, 1.0].pick_random()
+
+	if linear_velocity.x * direction < obstacle_slide_speed:
+		linear_velocity.x = direction * obstacle_slide_speed
 
 
 # ----------------------------

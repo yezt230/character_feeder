@@ -191,23 +191,12 @@ _data = {
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_nxlau"]
 size = Vector2(139, 261)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_7d04f"]
-size = Vector2(290, 168)
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_slippery"]
+friction = 0.0
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_skcvu"]
-size = Vector2(189.48328, 15)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_u3ntc"]
-size = Vector2(167.79434, 12.474876)
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_7d04f"]
-radius = 118.016945
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_787so"]
-size = Vector2(95, 23)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_w2gp3"]
-size = Vector2(254, 110)
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_nxlau"]
+radius = 129.0
+height = 444.0
 
 [node name="Predator" type="Node2D" unique_id=493401095 groups=["predator"]]
 script = ExtResource("1_8or0i")
@@ -272,39 +261,11 @@ bus = &"SFX"
 [node name="BodyCollision" type="StaticBody2D" parent="." unique_id=1211106705]
 collision_layer = 32
 collision_mask = 0
+physics_material_override = SubResource("PhysicsMaterial_slippery")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="BodyCollision" unique_id=981985762]
-position = Vector2(-25, 150)
-shape = SubResource("RectangleShape2D_7d04f")
-debug_color = Color(0.88235295, 0.6, 0.69803923, 0.41960785)
-
-[node name="CollisionShape2D2" type="CollisionShape2D" parent="BodyCollision" unique_id=543872194]
-position = Vector2(-106, -94.00001)
-rotation = -0.95644045
-shape = SubResource("RectangleShape2D_skcvu")
-debug_color = Color(0.88235295, 0.6, 0.69803923, 0.41960785)
-
-[node name="CollisionShape2D3" type="CollisionShape2D" parent="BodyCollision" unique_id=1592215054]
-position = Vector2(73.99999, -110.99999)
-rotation = 0.9599311
-scale = Vector2(0.9999999, 0.9999999)
-shape = SubResource("RectangleShape2D_u3ntc")
-debug_color = Color(0.88235295, 0.6, 0.69803923, 0.41960785)
-
-[node name="CollisionShape2D4" type="CollisionShape2D" parent="BodyCollision" unique_id=1079025005]
-position = Vector2(-13, -30)
-shape = SubResource("CircleShape2D_7d04f")
-debug_color = Color(0.88235295, 0.6, 0.69803923, 0.41960785)
-
-[node name="CollisionShape2D5" type="CollisionShape2D" parent="BodyCollision" unique_id=1233615366]
-position = Vector2(-8, -154)
-shape = SubResource("RectangleShape2D_787so")
-debug_color = Color(0.88235295, 0.6, 0.69803923, 0.41960785)
-
-[node name="CollisionShape2D6" type="CollisionShape2D" parent="BodyCollision" unique_id=253541466]
-position = Vector2(-22, 21)
-shape = SubResource("RectangleShape2D_w2gp3")
-debug_color = Color(0.88235295, 0.6, 0.69803923, 0.41960785)
+[node name="CollisionShape2D" type="CollisionShape2D" parent="BodyCollision" unique_id=1429250637]
+position = Vector2(-16, 29)
+shape = SubResource("CapsuleShape2D_nxlau")
 
 [connection signal="area_entered" from="MouthOpenCollision" to="." method="_on_mouth_open_collision_area_entered"]
 [connection signal="area_exited" from="MouthOpenCollision" to="." method="_on_mouth_open_collision_area_exited"]
